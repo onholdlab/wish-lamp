@@ -338,7 +338,7 @@ const W8=[
    if(s.tt<7.4)rate(.5,dt,()=>sp(['🛋️','📚','🍖','🪑','🥕','📝'][Math.random()*6|0],R(0,W),R(0,H),{s:R(36,70),life:600,vr:R(-.03,.03)}));
    let ate=0;for(const p of P){if(p!==z&&!p.c&&p.g!=='✨'&&Math.hypot(p.x-z.x,p.y-z.y)<z.s*.4){p.life=0;pops++;ate=1;if(z.s<420)z.s+=3}}if(ate){hud();tone(300,.1,'square',.06,120)}}}},
 {e:'🚀',n:'我要去外太空',a:0,dur:8.6,ia:'none',c:[[0,'三、二、一，發射！'],[1,'按住加速，左右帶路閃隕石！'],[3.6,'你抵達外太空了。'],[5,'外太空說：請先抽號碼牌。'],[7,'你抽到第 9,999,999 號。']],
- fx(s,dt){spaceFx(s,dt);if(s.tt>5&&!s.tk){s.tk=1;SNG.dingdong();s.tik=sp('🎫',W*.5,H*.32,{s:40,gr:1.02,life:300,noPop:1,free:1,vr:.02})}if(s.tik&&s.tik.s>150){s.tik.gr=1;s.tik.vr=0}if(s.tt>7&&!s.tk2){s.tk2=1;SNG.dingdong();shake=12;for(let i=0;i<20;i++)sp('👽',R(0,W),R(H*.1,H*.5),{s:R(30,50),life:200,noPop:1,free:1,vx:R(-.5,.5)})}}},
+ fx(s,dt){spaceFx(s,dt);knock(s);if(s.tt>5&&!s.tk){s.tk=1;SNG.dingdong();s.tik=sp('🎫',W*.5,H*.32,{s:40,gr:1.02,life:300,noPop:1,free:1,vr:.02})}if(s.tik&&s.tik.s>150){s.tik.gr=1;s.tik.vr=0}if(s.tt>7&&!s.tk2){s.tk2=1;s.kb0=s.tt;SNG.dingdong();shake=12;for(let i=0;i<20;i++)sp('👽',R(0,W),R(H*.1,H*.5),{s:R(30,50),life:200,noPop:1,free:1,vx:R(-.5,.5)})}}},
 {e:'🪄',n:'我要會魔法',a:0,dur:8.4,ia:'frog',c:[[0,'你會魔法了。'],[1.8,'點一下，施展變身術。'],[4.8,'魔法有點失控。'],[6.2,'全世界都變成青蛙了。包括你。']],
  fx(s,dt){if(!s.k){s.k=1;for(let i=0;i<40;i++)sp(['🧹','📚','🦉','🕯️','🧪'][i%5],R(0,W),R(0,H),{s:R(40,80),vr:R(-.03,.03),life:700,vx:R(-1,1),vy:R(-1,1)})}
   if(s.tt>4.8&&s.tt<6.2)rate(.8,dt,()=>{const p=P[Math.random()*P.length|0];if(p&&!p.c&&p.g!=='🐸'){p.g='🐸';sp('✨',p.x,p.y,{s:30,life:30,free:1,gr:1.05,noPop:1})}});
@@ -472,6 +472,16 @@ function burst(x,y,k=1){const c=['#14e3c8','#ff2e88','#ffb703','#f6efe0'][Math.r
 function frog(x,y){for(let i=P.length-1;i>=0;i--){const p=P[i];if(p.c||p.life<=0||p.noPop||p.g==='✨'||p.g==='🐸')continue;if(Math.hypot(p.x-x,p.y-y)<p.s*.55+14){p.g='🐸';p.grav=.3;p.bounce=.85;p.vy=-9;pops++;hud();SNG.ribbit(.15);for(let j=0;j<6;j++)sp('✨',p.x,p.y,{vx:R(-4,4),vy:R(-4,4),s:R(16,28),life:30,gr:.96,noPop:1});tone(500,.15,'triangle',.07,1100);return}}}
 function pet(x,y){for(let i=P.length-1;i>=0;i--){const p=P[i];if(p.c||p.life<=0||p.noPop||p.g==='✨')continue;if(Math.hypot(p.x-x,p.y-y)<p.s*.55+14){if(cur.w.pt&&p.g!==cur.w.pt)continue;pops++;hud();p.s=Math.min(260,p.s*1.12);if(cur.w.tapS)cur.w.tapS();else tone(700,.12,'triangle',.07,1100);const f=cur.w.pf;for(let j=0;j<4;j++)sp(f[j%f.length],p.x+R(-20,20),p.y,{vy:-R(2,4),vx:R(-1,1),s:R(22,34),life:50,noPop:1});if(navigator.vibrate)navigator.vibrate(10);return}}}
 function cmd(x,y){pops++;hud();SFX.boom();ring('#ff2e88',x,y);for(const p of P){if(p.c||p.dvd)continue;const dx=p.x-x,dy=p.y-y,d=Math.hypot(dx,dy)||1;if(d<320){const v=(320-d)/320*18;p.vx=(p.vx||0)+dx/d*v;p.vy=(p.vy||0)+dy/d*v}}if(navigator.vibrate)navigator.vibrate(15)}
+/* 抽到 9,999,999 號：號碼牌把火箭硬生生推回去，衝擊、翻滾、再彈回來 */
+function knock(s){const z=s.pz;if(!z||s.kb0==null)return;const k=s.tt-s.kb0;if(k<0||k>2.8)return;
+ if(k<.06&&!s.kbi){s.kbi=1;shake=44;flash();SFX.boom();SNG.crash();if(navigator.vibrate)navigator.vibrate([60,40,60]);ring('#ff2e88',z.x,z.y);ring('#ffb703',z.x,z.y);
+  for(let i=0;i<30;i++){const a=R(-Math.PI,0),v=R(3,10);sp(['🔥','✨','🔩'][i%3],z.x,z.y,{vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:R(16,30),life:40,noPop:1,free:1,grav:.3})}
+  if(s.tik)s.tik.s=260}
+ if(s.kbi&&Math.random()<.9)sp('🔥',z.x+R(-14,14),z.y+z.s*.4,{vy:R(2,6),vx:R(-1,1),s:R(18,34),life:26,gr:.94,noPop:1,free:1});
+ const A=H*.38;let off,tilt;
+ if(k<.18){off=-A*(k/.18);tilt=-2.2*(k/.18)}
+ else{const q=k-.18;off=-A*Math.exp(-1.9*q)*(1+.22*Math.cos(10*q)*Math.exp(-3*q));tilt=-2.2*Math.exp(-2.2*q)}
+ z.y=H*.72+off;z.r=-.785+tilt}
 function spaceFx(s,dt){const u=s.tt;
  if(!s.k){s.k=1;SFX.boom();s.pz=sp('🚀',W/2,H*.72,{s:130,life:700,noPop:1,m:'x',r:-.785});ring('#ffb703',W/2,H*.78);flash();for(let i=0;i<7;i++)sp(['🪐','🌍','🌕','🌑'][i%4],W/2,H/2,{m:'orbit',ang:R(0,6.28),rad:R(140,420),va:R(.006,.02)*(i%2?1:-1),vr2:0,s:R(60,110),life:700,noPop:1})}
  const z=s.pz;if(!z)return;const b=mouse.down?1.7:1;s.sq=(s.sq||0)+dt;if(s.sq>18){s.sq=0;noise(.3,.05*b,500)}
@@ -555,14 +565,17 @@ function sink(){$('ch').innerHTML='';say('');state='sink';sinkT=0;$('genie').cla
 function final(){state='final';const peakP=Math.round(Math.min(1,peak)*100),score=pops*10+peakP*3,rank=LT(pops<5?'佛系許願人':pops<15?'手滑戳破者':pops<30?'災難清道夫':'混亂製造機');const sw=picks.filter(w=>KIND[w.n]==='爽').length,tl=LANG==='en'?`Good ${sw} · Bad ${3-sw}: ${LT(['神燈今天心情不好','被捉弄的居多','大致是爽的','你是人生贏家'][sw])}`:`爽 ${sw}・損 ${3-sw}：${['神燈今天心情不好','被捉弄的居多','大致是爽的','你是人生贏家'][sw]}`;let best=score;try{best=Math.max(score,+localStorage.getItem('gl_best')||0);localStorage.setItem('gl_best',best)}catch(e){}
  $('sum').innerHTML=picks.map(w=>w.e+' '+LT(w.n)).join('<br>')+(LANG==='en'?`<br><br>${tl}<br>Title: ${rank}<br>Chaos ${score} (personal best ${best})<br>Taps ${pops}, peak chaos ${peakP}%.<br>Your first wisher is rubbing the lamp.`:`<br><br>${tl}<br>稱號：${rank}<br>混亂值 ${score}（個人最佳 ${best}）<br>互動 ${pops} 次，最高災情 ${peakP}%。<br>你的第一位許願者，正在擦燈。`);
  const tx=LANG==='en'?`I wished for "${picks.map(w=>LT(w.n).replace(/^I (want|never want) /,'')).join(', ')}" in Wish Lamp: Wishes Gone Wrong. ${tl}, chaos ${score} (${rank}). Ended up trapped in the lamp 🧞`:`我在《許願神燈：願望失控》許了「${picks.map(w=>w.n.replace('我要','')).join('、')}」，${tl}，混亂值 ${score}（${rank}），最後被關進燈裡 🧞`;
- $('shx').href=`https://twitter.com/intent/tweet?text=${encodeURIComponent(tx)}&url=${encodeURIComponent(SHARE)}`;
- $('sht').href=`https://www.threads.net/intent/post?text=${encodeURIComponent(tx+' '+SHARE)}`;
+ SHARE_MSG=tx;$('shx').href=`https://x.com/intent/post?text=${encodeURIComponent(tx+'\n'+SHARE)}`;
+ $('sht').href=`https://www.threads.net/intent/post?text=${encodeURIComponent(tx+'\n'+SHARE)}`;
  $('gvmsg').textContent='';/* 玩完：每台裝置只算一次，和許願同單位，比例才有意義 */(()=>{let f=0;try{f=localStorage.getItem('wl_finished')}catch(e){}if(!f)evPost('finish').then(()=>{try{localStorage.setItem('wl_finished','1')}catch(e){}}).catch(()=>{})})();$('end').classList.add('on')}
 function restart(){darkT=0;dark=0;P=[];rings=[];picks=[];round=0;chaos=0;hue=0;rub=0;inv=false;frozen=false;ts=1;fil();state='rub';$('end').classList.remove('on');$('genie').className='';
  pops=0;peak=0;rubSec=0;rub0=0;hud();say('按住神燈，來回擦拭。')}
 $('re').onclick=restart;
 $('snd').textContent=mute?'🔇':'🔊';$('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊';try{localStorage.setItem('gl_mute',mute?'1':'0')}catch(e){}if(!mute)SFX.pop()};
 const SHARE=location.origin+location.pathname;
+let SHARE_MSG='';
+/* 手機：叫出系統分享選單（可直接選 X / Threads 等 App），文字和遊戲連結一起帶過去；不支援時才開網頁版 */
+['shx','sht'].forEach(id=>$(id).addEventListener('click',e=>{if(!navigator.share||!SHARE_MSG)return;e.preventDefault();navigator.share({text:SHARE_MSG,url:SHARE,title:'許願神燈：願望失控'}).catch(()=>{})}));
 function applyLang(){const en=LANG==='en';document.documentElement.lang=en?'en':'zh-Hant';document.title=en?'Wish Lamp: Wishes Gone Wrong':'許願神燈：願望失控';
  $('hb').textContent=LT('許願神燈');$('hc').textContent=LT('災情');$('snd').setAttribute('aria-label',LT('音效'));$('lg').textContent=en?'中':'EN';
  $('eh').textContent=en?LT('你現在住在燈裡。'):'你現在住在燈裡。';$('shx').textContent=LT('分享到 X');$('sht').textContent=LT('分享到 Threads');$('cp').textContent=LT('複製連結');$('re').textContent=LT('再許一次');
