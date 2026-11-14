@@ -74,7 +74,7 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 #end p{max-width:30em;line-height:1.8;font-size:clamp(15px,2.6vw,19px);margin:0}
 #end.on{animation:fi .9s cubic-bezier(.2,1.3,.4,1)}@keyframes fi{from{opacity:0;transform:scale(.85)}}
 #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}#flash.on{animation:fl .35s ease-out}@keyframes fl{from{opacity:.85}to{opacity:0}}
-#snd{pointer-events:auto;padding:2px 8px;font-size:16px;border-radius:10px;border-width:1px}
+#snd,#lg{pointer-events:auto;padding:2px 8px;font-size:16px;border-radius:10px;border-width:1px}
 #sh{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 #sh a{display:inline-block;text-decoration:none;font:700 clamp(15px,2.6vw,19px) 'Noto Serif TC',serif;color:var(--bone);background:rgba(11,8,56,.78);border:2px solid var(--teal);border-radius:14px;padding:14px 18px}
 #sh a:hover{box-shadow:0 0 28px var(--teal)}
@@ -88,14 +88,159 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 </head>
 <body>
 <div id="stage"><canvas id="c"></canvas></div>
-<div id="hud"><b>許願神燈</b><span id="rd">願望 0 / 3</span><span>災情</span><i id="bar"><u></u></i><button id="snd" aria-label="音效">🔊</button></div>
+<div id="hud"><b id="hb">許願神燈</b><span id="rd">願望 0 / 3</span><span id="hc">災情</span><i id="bar"><u></u></i><button id="lg" aria-label="Language">EN</button><button id="snd" aria-label="音效">🔊</button></div>
 <div id="genie">🧞</div>
 <div id="say">按住神燈，來回擦拭。</div>
 <div id="ch"></div>
 <div id="cap"></div>
 <div id="flash"></div>
-<div id="end"><h2>你現在住在燈裡。</h2><p id="sum"></p><div id="sh"><a id="shx" target="_blank" rel="noopener">分享到 X</a><a id="sht" target="_blank" rel="noopener">分享到 Threads</a><button id="cp">複製連結</button></div><div id="ac"><button id="re">再許一次</button><button id="gv">🧞 當朋友的燈神（開發中，點擊以許願開啟）</button></div><p id="gvmsg"></p></div>
+<div id="end"><h2 id="eh">你現在住在燈裡。</h2><p id="sum"></p><div id="sh"><a id="shx" target="_blank" rel="noopener">分享到 X</a><a id="sht" target="_blank" rel="noopener">分享到 Threads</a><button id="cp">複製連結</button></div><div id="ac"><button id="re">再許一次</button><button id="gv">🧞 當朋友的燈神（開發中，點擊以許願開啟）</button></div><p id="gvmsg"></p></div>
 <script>
+const EN={
+'金幣如雨落下。你很滿意。':'Gold coins rain from the sky. You are delighted.',
+'但沒人說過硬幣不能長大。':'Nobody said coins can\'t grow.',
+'一枚硬幣重 40 噸。':'One coin weighs 40 tons.',
+'你被財富壓扁了。':'Wealth has flattened you.',
+'你變成世界最高的人。':'You become the tallest person in the world.',
+'雲從你的膝蓋穿過。':'Clouds drift past your knees.',
+'你的頭撞到月亮。月亮很痛。':'Your head bumps the moon. The moon is in pain.',
+'你現在是一顆衛星。':'Congratulations, you are a satellite now.',
+'全世界都愛上你了。':'The whole world falls in love with you.',
+'每個人。同時。點他們簽名。':'Everyone. At once. Tap them to sign autographs.',
+'他們全都在你家門口。':'They are all outside your front door.',
+'沒人打算離開。有人開始搭帳篷。':'Nobody plans to leave. Someone starts pitching a tent.',
+'作業全部飛走了。':'All the homework flies away.',
+'它們在你身邊盤旋。':'It circles around you.',
+'你不用寫作業了。':'You never have to do homework again.',
+'因為你變成作業了。':'Because you have become the homework.',
+'時間暫停。':'Time stops.',
+'只有你還能動。':'Only you can still move.',
+'你的外送也暫停了。':'Your delivery food has stopped too.',
+'你忘了問怎麼取消。':'You forgot to ask how to cancel.',
+'你學會飛了。':'You learn to fly.',
+'重力決定改為向上。':'Gravity has decided to point upward.',
+'牛先抵達外太空。':'A cow reaches outer space first.',
+'你的家具跟在後面。':'Your furniture follows behind.',
+'貓開始接管世界。點點貓，服侍牠們。':'Cats take over the world. Tap a cat to serve it.',
+'第一道法令：所有東西都要從桌上掉下去。':'Decree #1: everything must fall off the table.',
+'第二道法令：你就是那張桌子。':'Decree #2: you are the table.',
+'貓把你身上的東西一個一個撥下去。':'The cats swat your belongings off you, one by one.',
+'一片完美的披薩。':'One perfect slice of pizza.',
+'它一直變大。':'It keeps getting bigger.',
+'它開始扭動。':'It starts to wriggle.',
+'啪！':'Splat!',
+'啪！！':'Splat!!',
+'你只是想吃宵夜而已。':'You just wanted a midnight snack.',
+'你聽見全世界的心聲了。':'You hear the thoughts of the whole world.',
+'全部都在想：午餐吃什麼。':'Everyone is thinking: what\'s for lunch?',
+'而且沒人打算請你。':'And nobody plans to treat you.',
+'你決定自己吃。':'You decide to eat by yourself.',
+'你隱形了。':'You are invisible.',
+'世界也跟著消失，因為沒人在看你。':'The world fades too, because nobody is looking at you.',
+'只剩你的手指，和一點尷尬。':'Only your fingers remain, and a little embarrassment.',
+'你重新出現。大家都看到你剛剛在做什麼。':'You reappear. Everyone saw what you were just doing.',
+'你永遠準時了。':'You are forever on time.',
+'鬧鐘從世界各地湧來。':'Alarm clocks pour in from all over the world.',
+'時間快轉，因為你太早到了。':'Time fast-forwards, because you arrived way too early.',
+'你到了。公司明天才開門。':'You have arrived. The office doesn\'t open until tomorrow.',
+'全世界都聽你的。':'The whole world obeys you.',
+'它們跟著你的手指走。點一下下令散開！':'They follow your finger. Tap to order them to scatter!',
+'你打了個噴嚏。':'You sneeze.',
+'全世界也跟著打了一個。':'The whole world sneezes too.',
+'一顆蛋。':'One egg.',
+'孵出恐龍了。牠很餓。':'It hatches into a dinosaur. It is hungry.',
+'用手指帶牠去吃東西！':'Lead it to food with your finger!',
+'牠把你的家具吃光了。':'It has eaten all your furniture.',
+'還有你的作業。這次是真的。':'And your homework. This time for real.',
+'三、二、一，發射！':'Three, two, one, liftoff!',
+'按住加速，左右帶路閃隕石！':'Hold to speed up, steer left and right to dodge meteors!',
+'你抵達外太空了。':'You have reached outer space.',
+'外太空說：請先抽號碼牌。':'Outer space says: please take a number first.',
+'你抽到第 9,999,999 號。':'You get number 9,999,999.',
+'你會魔法了。':'You can do magic.',
+'點一下，施展變身術。':'Tap to cast a transformation spell.',
+'魔法有點失控。':'The magic is getting out of hand.',
+'全世界都變成青蛙了。包括你。':'The whole world turned into frogs. You too.',
+'你開始往下挖。按住挖更快。':'You start digging down. Hold to dig faster.',
+'你挖到恐龍化石了。':'You dig up a dinosaur fossil.',
+'你挖到熔岩了。它有點意見。':'You hit lava. It has some opinions.',
+'地心有一間便利商店，還在營業。':'There is a convenience store at the Earth\'s core, still open.',
+'你的運氣變得超好。':'Your luck becomes incredible.',
+'點一下拉霸！':'Tap to pull the slot lever!',
+'連中大獎。金幣滿天下。':'Jackpot after jackpot. Gold everywhere.',
+'但就在這時，一顆隕石砸向地球。':'But right then, a meteor crashes toward Earth.',
+'你的錢全部炸沒了。現在連零錢都是零。':'All your money explodes. Now even your spare change is zero.',
+'天氣變得很涼爽。':'The weather becomes very cool.',
+'非常涼爽。':'Extremely cool.',
+'冰河期開始了。點企鵝幫牠取暖。':'The ice age begins. Tap a penguin to keep it warm.',
+'你的涼爽，維持了一萬年。':'Your coolness lasts ten thousand years.',
+'機器人幫你做所有事。':'Robots do everything for you.',
+'它們也負責複製自己。':'They also take care of copying themselves.',
+'它們開始幫你做決定。':'They start making decisions for you.',
+'你的人生已被排好。第一件事：把你關機。':'Your life is scheduled. First item: shut you down.',
+'你有超級力量了。':'You have superpowers.',
+'點哪裡，哪裡就爆。':'Tap anywhere, and it explodes.',
+'你一拳打穿大氣層。':'You punch straight through the atmosphere.',
+'月亮碎了。':'The moon shatters.',
+'碎片全部朝你臉上飛過來。':'Every fragment flies straight at your face.',
+'你再也不會胖了。':'You will never gain weight again.',
+'點食物，把它吃掉。':'Tap food to eat it.',
+'你吃掉了一整間自助餐。身材一點都沒變。':'You eat an entire buffet. Your figure hasn\'t changed one bit.',
+'你往床上一坐。':'You sit down on the bed.',
+'床直接被你坐垮了。體重一公斤都沒少。':'The bed collapses under you. You haven\'t lost a single kilo.',
+'你成為世界巨星了。':'You become a world-famous star.',
+'點粉絲，讓他們尖叫。':'Tap fans to make them scream.',
+'安可！安可！':'Encore! Encore!',
+'全世界跟著你一起唱。連貓都在合音。':'The whole world sings along. Even the cats join in.',
+'你在遊戲裡無敵了。':'You are invincible in games.',
+'點擊射擊外星人。':'Tap to shoot the aliens.',
+'魔王出現！連點打爆牠！':'The boss appears! Tap rapidly to blow it up!',
+'魔王爆了。稱號解鎖：一直點的人。':'The boss is defeated. Title unlocked: The One Who Kept Tapping.',
+'整座城市為你放煙火。':'The whole city sets off fireworks for you.',
+'點哪裡，哪裡就炸開。':'Tap anywhere, and it bursts open.',
+'煙火越來越大。':'The fireworks keep getting bigger.',
+'月亮拍手。鄰居說：今年的跨年不用放了。':'The moon claps. The neighbors say: no need for New Year\'s fireworks this year.',
+'我要花不完的錢':'I want endless money',
+'我要變成最高的人':'I want to be the tallest person',
+'我要全世界都愛我':'I want the whole world to love me',
+'我要永遠不用寫作業':'I never want homework again',
+'我要時間暫停':'I want time to stop',
+'我要會飛':'I want to fly',
+'我要讓貓統治世界':'I want cats to rule the world',
+'我要一片超好吃的披薩':'I want the most delicious pizza ever',
+'我要有讀心術':'I want mind-reading',
+'我要隱形':'I want to be invisible',
+'我要永遠不會遲到':'I never want to be late again',
+'我要全世界都聽我的':'I want the whole world to obey me',
+'我要一隻寵物恐龍':'I want a pet dinosaur',
+'我要去外太空':'I want to go to outer space',
+'我要會魔法':'I want magic',
+'我要挖到地心':'I want to dig to the Earth\'s core',
+'我要永遠好運':'I want perpetual good luck',
+'我要天氣永遠涼爽':'I want the weather to stay cool forever',
+'我要機器人幫我做一切':'I want robots to do everything for me',
+'我要超級力量':'I want superpowers',
+'我要吃不胖':'I want to eat without gaining weight',
+'我要成為世界巨星':'I want to become a world-famous star',
+'我要在遊戲裡無敵':'I want to be invincible in games',
+'我要一場超大煙火秀':'I want a giant fireworks show',
+'你擦了我。三個願望，隨便選——字面意思也算。願望發生時，點點看畫面上的東西。':'You rubbed me. Three wishes, pick any. Literally, too. While a wish plays out, tap things on the screen.',
+'很好。世界現在有點歪，但你繼續。':'Good. The world is a little crooked now, but keep going.',
+'最後一個願望。我先說：我盡力了。':'Last wish. Just so you know: I did my best.',
+'按住神燈，來回擦拭。':'Hold the lamp and rub back and forth.',
+'三個願望用完了。附帶條款第 4 條：許願者自動接任神燈。':'All three wishes are used up. Clause 4 of the fine print: the wisher automatically becomes the next genie.',
+'佛系許願人':'Zen Wisher','手滑戳破者':'Clumsy Popper','災難清道夫':'Disaster Cleaner','混亂製造機':'Chaos Machine',
+'神燈今天心情不好':'The genie is in a bad mood today','被捉弄的居多':'Mostly tricked','大致是爽的':'Mostly good','你是人生贏家':'You are a life winner',
+'你現在住在燈裡。':'You now live in the lamp.',
+'你的第一位許願者，正在擦燈。':'Your first wisher is rubbing the lamp.',
+'已複製！':'Copied!','複製連結':'Copy link',
+'神燈收到你的願望了':'The genie received your wish.',
+'許願神燈':'Wish Lamp','災情':'Chaos','音效':'Sound','分享到 X':'Share on X','分享到 Threads':'Share on Threads','再許一次':'Wish again',
+'🧞 當朋友的燈神（開發中，點擊以許願開啟）':'🧞 Be a friend\'s genie (in development, tap to make a wish)',
+};
+
+let LANG=(()=>{try{const q=new URLSearchParams(location.search).get('lang');if(q=='en'||q=='zh')return q;const v=localStorage.getItem('wl_lang');if(v=='en'||v=='zh')return v}catch(e){}return(navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'})();
+const LT=s=>LANG==='en'&&EN[s]!=null?EN[s]:s;
 const API='https://ohl-api.onholdlab.workers.dev';/* 填入 Worker 網址（例如 https://ohl-api.onholdlab.workers.dev）；空字串＝跳過所有計數功能 */
 const $=id=>document.getElementById(id),R=(a,b)=>a+Math.random()*(b-a);
 const cv=$('c'),ctx=cv.getContext('2d'),RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -112,8 +257,8 @@ function sp(g,x,y,o={}){if(P.length>260)P.shift();const p=Object.assign({g,x,y,v
 function ring(c,x=W/2,y=H/2){rings.push({x,y,r:10,a:1,c})}
 function rate(n,dt,f){let c=n*dt;while(c>0){if(Math.random()<c)f();c--}}
 function fil(){}
-function setCap(t){const c=$('cap');c.classList.remove('on');void c.offsetWidth;c.textContent=t;if(t)c.classList.add('on')}
-const say=t=>$('say').textContent=t;
+function setCap(t){const c=$('cap');c.classList.remove('on');void c.offsetWidth;c.textContent=LT(t);if(t)c.classList.add('on')}
+let sayRaw='按住神燈，來回擦拭。';const say=t=>{sayRaw=t;$('say').textContent=LT(t)};
 
 const W8=[
 {e:'🪙',n:'我要花不完的錢',a:70,dur:8.2,tapS:()=>SNG.clink(),c:[[0,'金幣如雨落下。你很滿意。'],[3.5,'但沒人說過硬幣不能長大。'],[6,'一枚硬幣重 40 噸。'],[6.9,'你被財富壓扁了。']],
@@ -193,7 +338,7 @@ const W8=[
    if(s.tt<7.4)rate(.5,dt,()=>sp(['🛋️','📚','🍖','🪑','🥕','📝'][Math.random()*6|0],R(0,W),R(0,H),{s:R(36,70),life:600,vr:R(-.03,.03)}));
    let ate=0;for(const p of P){if(p!==z&&!p.c&&p.g!=='✨'&&Math.hypot(p.x-z.x,p.y-z.y)<z.s*.4){p.life=0;pops++;ate=1;if(z.s<420)z.s+=3}}if(ate){hud();tone(300,.1,'square',.06,120)}}}},
 {e:'🚀',n:'我要去外太空',a:0,dur:8.6,ia:'none',c:[[0,'三、二、一，發射！'],[1,'按住加速，左右帶路閃隕石！'],[3.6,'你抵達外太空了。'],[5,'外太空說：請先抽號碼牌。'],[7,'你抽到第 9,999,999 號。']],
- fx(s,dt){spaceFx(s,dt);if(s.tt>5&&!s.tk){s.tk=1;SNG.dingdong();s.tik=sp('🎫',W*.5,H*.32,{s:40,gr:1.02,life:300,noPop:1,free:1,vr:.02})}if(s.tik&&s.tik.s>150){s.tik.gr=1;s.tik.vr=0}if(s.tt>7&&!s.tk2){s.tk2=1;SNG.dingdong();shake=12;for(let i=0;i<20;i++)sp('👽',R(0,W),R(H*.1,H*.5),{s:R(30,50),life:200,noPop:1,free:1,vx:R(-.5,.5)})}}},
+ fx(s,dt){spaceFx(s,dt);knock(s);if(s.tt>5&&!s.tk){s.tk=1;SNG.dingdong();s.tik=sp('🎫',W*.5,H*.32,{s:40,gr:1.02,life:300,noPop:1,free:1,vr:.02})}if(s.tik&&s.tik.s>150){s.tik.gr=1;s.tik.vr=0}if(s.tt>7&&!s.tk2){s.tk2=1;s.kb0=s.tt;SNG.dingdong();shake=12;for(let i=0;i<20;i++)sp('👽',R(0,W),R(H*.1,H*.5),{s:R(30,50),life:200,noPop:1,free:1,vx:R(-.5,.5)})}}},
 {e:'🪄',n:'我要會魔法',a:0,dur:8.4,ia:'frog',c:[[0,'你會魔法了。'],[1.8,'點一下，施展變身術。'],[4.8,'魔法有點失控。'],[6.2,'全世界都變成青蛙了。包括你。']],
  fx(s,dt){if(!s.k){s.k=1;for(let i=0;i<40;i++)sp(['🧹','📚','🦉','🕯️','🧪'][i%5],R(0,W),R(0,H),{s:R(40,80),vr:R(-.03,.03),life:700,vx:R(-1,1),vy:R(-1,1)})}
   if(s.tt>4.8&&s.tt<6.2)rate(.8,dt,()=>{const p=P[Math.random()*P.length|0];if(p&&!p.c&&p.g!=='🐸'){p.g='🐸';sp('✨',p.x,p.y,{s:30,life:30,free:1,gr:1.05,noPop:1})}});
@@ -255,7 +400,7 @@ const W8=[
   if(s.tt>6.8&&!s.k2){s.k2=1;sp('🌙',W*.8,H*.2,{s:120,life:120,noPop:1});sp('👏',W*.8,H*.2+90,{s:70,gr:1.02,vr:.1,life:120,noPop:1});SNG.clap(16,1.6)}}}
 ];
 
-function hud(){$('rd').textContent=`願望 ${round} / 3　互動 ${pops}`}
+function hud(){$('rd').textContent=LANG==='en'?`Wish ${round} / 3　Taps ${pops}`:`願望 ${round} / 3　互動 ${pops}`}
 let AC=null,mute=false,vox=0;try{mute=localStorage.getItem('gl_mute')==='1'}catch(e){}
 function au(){if(mute)return null;if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume();return AC}
 function tone(f,d,type='sine',v=.08,f2){const a=au();if(!a||vox>6)return;vox++;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d);o.onended=()=>vox--}
@@ -327,6 +472,16 @@ function burst(x,y,k=1){const c=['#14e3c8','#ff2e88','#ffb703','#f6efe0'][Math.r
 function frog(x,y){for(let i=P.length-1;i>=0;i--){const p=P[i];if(p.c||p.life<=0||p.noPop||p.g==='✨'||p.g==='🐸')continue;if(Math.hypot(p.x-x,p.y-y)<p.s*.55+14){p.g='🐸';p.grav=.3;p.bounce=.85;p.vy=-9;pops++;hud();SNG.ribbit(.15);for(let j=0;j<6;j++)sp('✨',p.x,p.y,{vx:R(-4,4),vy:R(-4,4),s:R(16,28),life:30,gr:.96,noPop:1});tone(500,.15,'triangle',.07,1100);return}}}
 function pet(x,y){for(let i=P.length-1;i>=0;i--){const p=P[i];if(p.c||p.life<=0||p.noPop||p.g==='✨')continue;if(Math.hypot(p.x-x,p.y-y)<p.s*.55+14){if(cur.w.pt&&p.g!==cur.w.pt)continue;pops++;hud();p.s=Math.min(260,p.s*1.12);if(cur.w.tapS)cur.w.tapS();else tone(700,.12,'triangle',.07,1100);const f=cur.w.pf;for(let j=0;j<4;j++)sp(f[j%f.length],p.x+R(-20,20),p.y,{vy:-R(2,4),vx:R(-1,1),s:R(22,34),life:50,noPop:1});if(navigator.vibrate)navigator.vibrate(10);return}}}
 function cmd(x,y){pops++;hud();SFX.boom();ring('#ff2e88',x,y);for(const p of P){if(p.c||p.dvd)continue;const dx=p.x-x,dy=p.y-y,d=Math.hypot(dx,dy)||1;if(d<320){const v=(320-d)/320*18;p.vx=(p.vx||0)+dx/d*v;p.vy=(p.vy||0)+dy/d*v}}if(navigator.vibrate)navigator.vibrate(15)}
+/* 抽到 9,999,999 號：號碼牌把火箭硬生生推回去，衝擊、翻滾、再彈回來 */
+function knock(s){const z=s.pz;if(!z||s.kb0==null)return;const k=s.tt-s.kb0;if(k<0||k>2.8)return;
+ if(k<.06&&!s.kbi){s.kbi=1;shake=44;flash();SFX.boom();SNG.crash();if(navigator.vibrate)navigator.vibrate([60,40,60]);ring('#ff2e88',z.x,z.y);ring('#ffb703',z.x,z.y);
+  for(let i=0;i<30;i++){const a=R(-Math.PI,0),v=R(3,10);sp(['🔥','✨','🔩'][i%3],z.x,z.y,{vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:R(16,30),life:40,noPop:1,free:1,grav:.3})}
+  if(s.tik)s.tik.s=260}
+ if(s.kbi&&Math.random()<.9)sp('🔥',z.x+R(-14,14),z.y+z.s*.4,{vy:R(2,6),vx:R(-1,1),s:R(18,34),life:26,gr:.94,noPop:1,free:1});
+ const A=H*.38;let off,tilt;
+ if(k<.18){off=-A*(k/.18);tilt=-2.2*(k/.18)}
+ else{const q=k-.18;off=-A*Math.exp(-1.9*q)*(1+.22*Math.cos(10*q)*Math.exp(-3*q));tilt=-2.2*Math.exp(-2.2*q)}
+ z.y=H*.72+off;z.r=-.785+tilt}
 function spaceFx(s,dt){const u=s.tt;
  if(!s.k){s.k=1;SFX.boom();s.pz=sp('🚀',W/2,H*.72,{s:130,life:700,noPop:1,m:'x',r:-.785});ring('#ffb703',W/2,H*.78);flash();for(let i=0;i<7;i++)sp(['🪐','🌍','🌕','🌑'][i%4],W/2,H/2,{m:'orbit',ang:R(0,6.28),rad:R(140,420),va:R(.006,.02)*(i%2?1:-1),vr2:0,s:R(60,110),life:700,noPop:1})}
  const z=s.pz;if(!z)return;const b=mouse.down?1.7:1;s.sq=(s.sq||0)+dt;if(s.sq>18){s.sq=0;noise(.3,.05*b,500)}
@@ -399,7 +554,7 @@ function summon(){state='genie';rub=0;rubSec=(performance.now()-(rub0||performan
  for(let i=0;i<140;i++){const a=R(-Math.PI,0),v=R(2,14);sp('●',lamp.x,lamp.y-20,{c:['#14e3c8','#ff2e88','#ffb703'][i%3],vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:R(10,40),life:90,gr:1.01})}
  $('genie').className='on';say(L[0]);showChoices()}
 function showChoices(){const used=picks.map(w=>w.n),pool=W8.filter(w=>!used.includes(w.n)).sort(()=>Math.random()-.5).slice(0,4);$('ch').innerHTML='';
- pool.forEach(w=>{const b=document.createElement('button');b.textContent=w.e+' '+w.n;b.onclick=()=>pick(w);$('ch').appendChild(b)})}
+ pool.forEach(w=>{const b=document.createElement('button');b.textContent=w.e+' '+LT(w.n);b._w=w;b.onclick=()=>pick(w);$('ch').appendChild(b)})}
 function pick(w){SFX.wish();$('ch').innerHTML='';say('');$('genie').classList.add('small');state='play';cur={w,tt:0,cap:0};picks.push(w)}
 function endWish(){setCap('');darkT=0;dark=0;chaos++;hue+=65;frozen=false;ts=1;inv=false;fil();round++;hud();
  $('genie').classList.remove('small');cur=null;
@@ -407,24 +562,33 @@ function endWish(){setCap('');darkT=0;dark=0;chaos++;hue+=65;frozen=false;ts=1;i
  else{state='end';say('三個願望用完了。附帶條款第 4 條：許願者自動接任神燈。');setTimeout(()=>{if(state==='end')sink()},3200)}}
 function sink(){$('ch').innerHTML='';say('');state='sink';sinkT=0;$('genie').className='gone';ring('#ff2e88');shake=20;fog(4.2);
  sp('🧍',W/2,H*.4,{s:200,life:999});P.forEach(p=>{p.m='suck';p.vx=p.vy=0;p.free=1})}
-function final(){state='final';const peakP=Math.round(Math.min(1,peak)*100),score=pops*10+peakP*3,rank=pops<5?'佛系許願人':pops<15?'手滑戳破者':pops<30?'災難清道夫':'混亂製造機';const sw=picks.filter(w=>KIND[w.n]==='爽').length,tl=`爽 ${sw}・損 ${3-sw}：${['神燈今天心情不好','被捉弄的居多','大致是爽的','你是人生贏家'][sw]}`;let best=score;try{best=Math.max(score,+localStorage.getItem('gl_best')||0);localStorage.setItem('gl_best',best)}catch(e){}
- $('sum').innerHTML=picks.map(w=>w.e+' '+w.n).join('<br>')+`<br><br>${tl}<br>稱號：${rank}<br>混亂值 ${score}（個人最佳 ${best}）<br>互動 ${pops} 次，最高災情 ${peakP}%。<br>你的第一位許願者，正在擦燈。`;
- const tx=`我在《許願神燈：願望失控》許了「${picks.map(w=>w.n.replace('我要','')).join('、')}」，${tl}，混亂值 ${score}（${rank}），最後被關進燈裡 🧞`;
- $('shx').href=`https://twitter.com/intent/tweet?text=${encodeURIComponent(tx)}&url=${encodeURIComponent(SHARE)}`;
- $('sht').href=`https://www.threads.net/intent/post?text=${encodeURIComponent(tx+' '+SHARE)}`;
+function final(){state='final';const peakP=Math.round(Math.min(1,peak)*100),score=pops*10+peakP*3,rank=LT(pops<5?'佛系許願人':pops<15?'手滑戳破者':pops<30?'災難清道夫':'混亂製造機');const sw=picks.filter(w=>KIND[w.n]==='爽').length,tl=LANG==='en'?`Good ${sw} · Bad ${3-sw}: ${LT(['神燈今天心情不好','被捉弄的居多','大致是爽的','你是人生贏家'][sw])}`:`爽 ${sw}・損 ${3-sw}：${['神燈今天心情不好','被捉弄的居多','大致是爽的','你是人生贏家'][sw]}`;let best=score;try{best=Math.max(score,+localStorage.getItem('gl_best')||0);localStorage.setItem('gl_best',best)}catch(e){}
+ $('sum').innerHTML=picks.map(w=>w.e+' '+LT(w.n)).join('<br>')+(LANG==='en'?`<br><br>${tl}<br>Title: ${rank}<br>Chaos ${score} (personal best ${best})<br>Taps ${pops}, peak chaos ${peakP}%.<br>Your first wisher is rubbing the lamp.`:`<br><br>${tl}<br>稱號：${rank}<br>混亂值 ${score}（個人最佳 ${best}）<br>互動 ${pops} 次，最高災情 ${peakP}%。<br>你的第一位許願者，正在擦燈。`);
+ const tx=LANG==='en'?`I wished for "${picks.map(w=>LT(w.n).replace(/^I (want|never want) /,'')).join(', ')}" in Wish Lamp: Wishes Gone Wrong. ${tl}, chaos ${score} (${rank}). Ended up trapped in the lamp 🧞`:`我在《許願神燈：願望失控》許了「${picks.map(w=>w.n.replace('我要','')).join('、')}」，${tl}，混亂值 ${score}（${rank}），最後被關進燈裡 🧞`;
+ SHARE_MSG=tx;$('shx').href=`https://x.com/intent/post?text=${encodeURIComponent(tx+'\n'+SHARE)}`;
+ $('sht').href=`https://www.threads.net/intent/post?text=${encodeURIComponent(tx+'\n'+SHARE)}`;
  $('gvmsg').textContent='';/* 玩完：每台裝置只算一次，和許願同單位，比例才有意義 */(()=>{let f=0;try{f=localStorage.getItem('wl_finished')}catch(e){}if(!f)evPost('finish').then(()=>{try{localStorage.setItem('wl_finished','1')}catch(e){}}).catch(()=>{})})();$('end').classList.add('on')}
 function restart(){darkT=0;dark=0;P=[];rings=[];picks=[];round=0;chaos=0;hue=0;rub=0;inv=false;frozen=false;ts=1;fil();state='rub';$('end').classList.remove('on');$('genie').className='';
  pops=0;peak=0;rubSec=0;rub0=0;hud();say('按住神燈，來回擦拭。')}
 $('re').onclick=restart;
 $('snd').textContent=mute?'🔇':'🔊';$('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊';try{localStorage.setItem('gl_mute',mute?'1':'0')}catch(e){}if(!mute)SFX.pop()};
 const SHARE=location.origin+location.pathname;
+let SHARE_MSG='';
+/* 手機：叫出系統分享選單（可直接選 X / Threads 等 App），文字和遊戲連結一起帶過去；不支援時才開網頁版 */
+['shx','sht'].forEach(id=>$(id).addEventListener('click',e=>{if(!navigator.share||!SHARE_MSG)return;e.preventDefault();navigator.share({text:SHARE_MSG,url:SHARE,title:'許願神燈：願望失控'}).catch(()=>{})}));
+function applyLang(){const en=LANG==='en';document.documentElement.lang=en?'en':'zh-Hant';document.title=en?'Wish Lamp: Wishes Gone Wrong':'許願神燈：願望失控';
+ $('hb').textContent=LT('許願神燈');$('hc').textContent=LT('災情');$('snd').setAttribute('aria-label',LT('音效'));$('lg').textContent=en?'中':'EN';
+ $('eh').textContent=en?LT('你現在住在燈裡。'):'你現在住在燈裡。';$('shx').textContent=LT('分享到 X');$('sht').textContent=LT('分享到 Threads');$('cp').textContent=LT('複製連結');$('re').textContent=LT('再許一次');
+ $('gv').textContent=LT('🧞 當朋友的燈神（開發中，點擊以許願開啟）');
+ hud();say(sayRaw);
+ $('lg').onclick=()=>{LANG=en?'zh':'en';try{localStorage.setItem('wl_lang',LANG)}catch(e){}applyLang();[...$('ch').children].forEach(b=>{if(b._w)b.textContent=b._w.e+' '+LT(b._w.n)})}}
 async function api(path,opt){if(!API)throw 0;const c=new AbortController(),t=setTimeout(()=>c.abort(),3000);try{const r=await fetch(API+path,{...opt,signal:c.signal});if(!r.ok)throw 0;return await r.json().catch(()=>({}))}finally{clearTimeout(t)}}
 const evPost=kind=>api('/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({game:'wish-lamp',kind})});
 const evCount=async kind=>{const j=await api('/count?game=wish-lamp&kind='+kind);const n=Number(j.n);if(!Number.isFinite(n))throw 0;return n};
 $('gv').onclick=async()=>{const b=$('gv'),m=$('gvmsg');if(b.disabled)return;b.disabled=true;let voted=false;try{voted=!!localStorage.getItem('wl_genie_voted')}catch(e){}
- try{if(!voted){try{await evPost('genie_vote')}catch(e){m.textContent='神燈收到你的願望了';return}try{localStorage.setItem('wl_genie_voted','1')}catch(e){}}
-  try{const n=await evCount('genie_vote');m.textContent=voted?`目前已有 ${n} 人許願`:`神燈收到你的願望了，目前已有 ${n} 人許願`}catch(e){m.textContent='神燈收到你的願望了'}}finally{b.disabled=false}};
-$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(SHARE)}catch(e){try{const t=document.createElement('textarea');t.value=SHARE;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}catch(e2){prompt('複製連結',SHARE)}}$('cp').textContent='已複製！';setTimeout(()=>$('cp').textContent='複製連結',1600)};
+ try{if(!voted){try{await evPost('genie_vote')}catch(e){m.textContent=LT('神燈收到你的願望了');return}try{localStorage.setItem('wl_genie_voted','1')}catch(e){}}
+  try{const n=await evCount('genie_vote');m.textContent=LANG==='en'?(voted?`${n} people have wished so far.`:`The genie received your wish. ${n} people have wished so far.`):voted?`目前已有 ${n} 人許願`:`神燈收到你的願望了，目前已有 ${n} 人許願`}catch(e){m.textContent=LT('神燈收到你的願望了')}}finally{b.disabled=false}};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(SHARE)}catch(e){try{const t=document.createElement('textarea');t.value=SHARE;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}catch(e2){prompt('複製連結',SHARE)}}$('cp').textContent=LT('已複製！');setTimeout(()=>$('cp').textContent=LT('複製連結'),1600)};
 
 function mv(e){const x=e.clientX,y=e.clientY,dx=x-mouse.x,dy=y-mouse.y;mouse.x=x;mouse.y=y;
  if(state==='rub'&&mouse.down){const s=lampS();if(Math.hypot(x-lamp.x,y-lamp.y)<190*s){rub=Math.min(1,rub+Math.hypot(dx,dy)/1800);if(!rub0)rub0=performance.now();
@@ -436,5 +600,6 @@ addEventListener('pointerup',()=>mouse.down=false);
 cv.addEventListener('pointermove',mv);
 requestAnimationFrame(frame);
 </script>
+<script>applyLang();</script>
 </body>
 </html>
