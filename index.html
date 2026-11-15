@@ -574,7 +574,7 @@ function restart(){darkT=0;dark=0;P=[];rings=[];picks=[];round=0;chaos=0;hue=0;r
  pops=0;peak=0;rubSec=0;rub0=0;hud();say('按住神燈，來回擦拭。')}
 $('re').onclick=restart;
 $('snd').textContent=mute?'🔇':'🔊';$('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊';try{localStorage.setItem('gl_mute',mute?'1':'0')}catch(e){}if(!mute)SFX.pop()};
-const SHARE=location.origin+location.pathname;
+const SHARE=document.querySelector('link[rel="canonical"]').href;
 let SHARE_MSG='';
 /* 手機：叫出系統分享選單（可直接選 X / Threads 等 App），文字和遊戲連結一起帶過去；不支援時才開網頁版 */
 ['shx','sht'].forEach(id=>$(id).addEventListener('click',e=>{if(!navigator.share||!SHARE_MSG)return;e.preventDefault();navigator.share({text:SHARE_MSG,url:SHARE,title:'許願神燈：願望失控'}).catch(()=>{})}));

@@ -21,6 +21,17 @@ test('有 canonical 指向 onholdlab.com', () => {
   assert.equal(meta(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i), BASE);
 });
 
+test('遊戲內分享與複製連結使用 canonical，即使頁面是預覽網址', () => {
+  const declaration = html.match(/^const SHARE=[^\r\n]+$/m)?.[0];
+  assert.ok(declaration, '找不到 SHARE 宣告');
+  const location = { origin: 'https://preview.example', pathname: '/index.html' };
+  const document = { querySelector(selector) {
+    assert.equal(selector, 'link[rel="canonical"]');
+    return { href: BASE };
+  } };
+  assert.equal(vm.runInNewContext(declaration + '\nSHARE', { location, document }), BASE);
+});
+
 function runRedirect(host, search = '', hash = '') {
   const m = html.match(/<script id=["']own-domain["']>([\s\S]*?)<\/script>/i);
   assert.ok(m, '找不到 <script id="own-domain">');
